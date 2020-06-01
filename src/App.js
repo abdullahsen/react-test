@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Person from './components/Person';
-
+import Person from './components/person/Person';
+import Button from './components/button/Button';
+import Spinner from './components/spinner/Spinner';
 import "./App.css";
 
 const URL = 'https://randomuser.me/api/?results=5';
@@ -12,49 +13,54 @@ function App() {
   const [people, setPeople] = useState([]);
   const [person, setPerson] = useState(null);
 
-  const style = {
-    backgroundColor: 'green',
-    color: 'white',
-    font: 'inherit',
-    border: '1px solid blue',
-    padding: '8px',
-    cursor: 'pointer',
-    margin: '16px'
-  }
 
-/*   useEffect(() => {
-    fetch(URL)
-      .then(response => response.json())
-      .then((data) => {
-        setIsLoaded(true);
-        setPeople(data.results);
-      },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      )
-  }, []) */
-
-  const fetchData = () => {
+  /* useEffect(()=> {
     setIsLoaded(false);
     setPerson(null)
+
     fetch(URL)
     .then(response => response.json())
     .then((data) => {
       setIsLoaded(true);
       setPeople(data.results);
+      setPerson(data.results[0])
     },
       (error) => {
         setIsLoaded(true);
         setError(error);
       }
     )
+  },[]) */
+
+  const fetchData = () => {
+
+    setIsLoaded(false);
+    setPerson(null)
+
+    fetch(URL)
+      .then(response => response.json())
+      .then((data) => {
+        setIsLoaded(true);
+        setPeople(data.results);
+        setPerson(data.results[0])
+      },
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
   }
 
-  let personDetails = null;
-  if (person){
-    personDetails = (<Person 
+  const personClickHandler = (index) => {
+    setPerson(people[index]);
+
+  }
+
+
+
+  let personDetails;
+  if (person) {
+    personDetails = (<Person
       imageUrl={person.picture.large}
       title={person.name.title}
       firstName={person.name.first}
@@ -62,36 +68,39 @@ function App() {
       gender={person.gender}
       phone={person.phone}
       email={person.email}
+      age={person.dob.age}
+      city={person.location.city}
+      state={person.location.state}
+      country={person.location.country}
+      postcode={person.location.postcode}
     />)
-  }else{
-    personDetails = null;
-  }
- 
-  let spinner;
-  if (!isLoaded){
-    spinner = (<div>Loading...</div>)
-  }else{
-    spinner = null
   }
 
-  const personClickHandler = (index) => {
-    setPerson(people[index]);
-    
-  }
-  
 
-  return(
+  let spinner = null;
+  if (!isLoaded) {
+    spinner = (<Spinner loading={true} />)
+  }
+
+
+  if (error) {
+    return <div>Error: <span>{error}</span></div>
+  }
+
+  const listElement =  (<div className="ListContainer">
+  {people.map((person, index) => {
+    return <p key={index} onClick={() => personClickHandler(index)} >{person.name.title} {person.name.first} {person.name.last}</p>
+  })}
+</div>);
+
+  return (
     <div className="App">
-      <button style={style} onClick={fetchData}>Fetch Users</button>
-      {people.map((person, index) => {
-        return <h4 onClick={()=> personClickHandler(index)} >{person.name.title} {person.name.first} {person.name.last}</h4>
-      })}
+      <Button clicked={fetchData} />
+      {(people.length===0) ? null : listElement }
       {spinner}
       {personDetails}
     </div>
   )
-
-
 }
 
 export default App;

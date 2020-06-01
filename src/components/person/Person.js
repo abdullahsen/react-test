@@ -3,8 +3,6 @@ import './Person.css'
 
 const Person = (props) => {
 
-
-
     return(
         <div className="Person">
             <img src={props.imageUrl} alt={props.firstName} />
@@ -13,6 +11,7 @@ const Person = (props) => {
             <p>{props.phone}</p>
             <p>{props.gender}</p>
             <p>{props.age}</p>
+            <p>{props.city} {props.state} {props.country} {props.postcode}</p>
         </div>
     )
 }
